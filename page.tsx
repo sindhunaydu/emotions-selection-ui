@@ -2,34 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import PrimaryEmotions from './components/PrimaryEmotions'
-import SecondaryEmotions from './components/SecondaryEmotions'
-import TertiaryEmotions from './components/TertiaryEmotions'
-import SelectedEmotions from './components/SelectedEmotions'
-import NavigationButtons from './components/NavigationButtons'
+import PrimaryEmotions from './app/components/PrimaryEmotions'
+import SecondaryEmotions from './app/components/SecondaryEmotions'
+import TertiaryEmotions from './app/components/TertiaryEmotions'
+import SelectedEmotions from './app/components/SelectedEmotions'
+import NavigationButtons from './app/components/NavigationButtons'
 
 interface Emotion {
   name: string
-  color: string
+  color?: string
   secondaryEmotions?: Emotion[]
   tertiaryEmotions?: Emotion[]
-}
-
-const colorMap: { [key: string]: string } = {
-  Blue: 'blue',
-  Red: 'red',
-  Yellow: 'yellow',
-  Green: 'green',
-  Purple: 'purple',
-  Pink: 'pink',
-  Gray: 'gray',
-  Orange: 'orange', // Add this line
-  // Add more color mappings as needed
-}
-
-const getColorClass = (color: string): string => {
-  const mappedColor = colorMap[color] || 'gray'
-  return `bg-${mappedColor}-200`
 }
 
 export default function Home() {
@@ -44,24 +27,33 @@ export default function Home() {
     fetch('http://localhost:8080/api/emotions/listAll')
       .then(response => {
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+          throw new Error('Failed to fetch emotions')
         }
         return response.json()
       })
       .then(data => {
-        console.log('Fetched emotions:', data)
-        setEmotions(data)
+        // Adjust colors for all primary emotions and their secondary emotions
+        const adjustedData = data.map((emotion: Emotion) => {
+          const primaryColor = emotion.color || 'Gray'
+          return {
+            ...emotion,
+            secondaryEmotions: emotion.secondaryEmotions?.map(se => ({ 
+              ...se, 
+              color: primaryColor,
+              tertiaryEmotions: se.tertiaryEmotions?.map(te => ({ ...te, color: primaryColor }))
+            }))
+          }
+        })
+        setEmotions(adjustedData)
         setIsLoading(false)
       })
       .catch(err => {
-        console.error('Error fetching emotions:', err.message)
         setError(err.message)
         setIsLoading(false)
       })
   }, [])
 
   const handleEmotionSelect = (emotion: Emotion) => {
-    console.log('Selected emotion:', emotion)
     setSelectedEmotions(prev => {
       const newSelected = [...prev]
       const index = newSelected[stage].findIndex(e => e.name === emotion.name)
@@ -74,7 +66,9 @@ export default function Home() {
       }
       return newSelected
     })
-    setBackgroundColor(getColorClass(emotion.color))
+    if (emotion.color) {
+      setBackgroundColor(`bg-${emotion.color.toLowerCase()}-200`)
+    }
   }
 
   const handleNextStage = () => {
@@ -93,7 +87,9 @@ export default function Home() {
       const lastStageEmotions = selectedEmotions[stage - 1]
       if (lastStageEmotions && lastStageEmotions.length > 0) {
         const lastEmotion = lastStageEmotions[lastStageEmotions.length - 1]
-        setBackgroundColor(getColorClass(lastEmotion.color))
+        if (lastEmotion.color) {
+          setBackgroundColor(`bg-${lastEmotion.color.toLowerCase()}-200`)
+        }
       } else {
         setBackgroundColor('bg-white')
       }
@@ -105,13 +101,7 @@ export default function Home() {
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-red-500">
-        <h2 className="text-2xl font-bold mb-4">Error fetching emotions</h2>
-        <p>{error}</p>
-        <p className="mt-4">Please check your API server and try again.</p>
-      </div>
-    )
+    return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>
   }
 
   const getCurrentEmotions = () => {
@@ -123,6 +113,12 @@ export default function Home() {
       return selectedEmotions[1].flatMap(e => e.tertiaryEmotions || [])
     }
     return []
+  }
+
+  const getEmotionColor = () => {
+    if (stage === 0) return ''
+    const parentEmotion = selectedEmotions[stage - 1][0]
+    return parentEmotion?.color ? `${parentEmotion.color.toLowerCase()}-100` : ''
   }
 
   return (
@@ -159,6 +155,7 @@ export default function Home() {
             emotions={getCurrentEmotions()}
             onSelect={handleEmotionSelect}
             selectedEmotions={selectedEmotions[stage]}
+            parentColor={getEmotionColor()}
           />
         )}
         {stage === 2 && (
@@ -166,6 +163,7 @@ export default function Home() {
             emotions={getCurrentEmotions()}
             onSelect={handleEmotionSelect}
             selectedEmotions={selectedEmotions[stage]}
+            parentColor={getEmotionColor()}
           />
         )}
       </AnimatePresence>
