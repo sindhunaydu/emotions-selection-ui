@@ -2,21 +2,34 @@ import { motion } from 'framer-motion'
 
 interface Emotion {
   name: string
-  color?: string
+  color: string
 }
 
 interface TertiaryEmotionsProps {
   emotions: Emotion[]
   onSelect: (emotion: Emotion) => void
   selectedEmotions: Emotion[]
-  parentColor: string
 }
 
-const getColorClass = (emotion: Emotion, isSelected: boolean, parentColor: string) => {
-  return `${emotion.color ? `bg-${emotion.color.toLowerCase()}-200` : `bg-${parentColor}-200`} p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-gray-800 font-semibold ${isSelected ? 'ring-2 ring-blue-500' : ''}`
+const getColorValue = (color: string): string => {
+  const colorMap: { [key: string]: string } = {
+    Blue: '#eff6ff',
+    Red: '#fef2f2',
+    Yellow: '#fefce8',
+    Green: '#f0fdf4',
+    Purple: '#faf5ff',
+    Pink: '#fdf2f8',
+    Gray: '#f9fafb',
+    Orange: '#fff7ed',
+  }
+  return colorMap[color] || '#ffffff'
 }
 
-export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions, parentColor }: TertiaryEmotionsProps) {
+export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions }: TertiaryEmotionsProps) {
+  if (!emotions || emotions.length === 0) {
+    return <div>No tertiary emotions available</div>
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -32,7 +45,10 @@ export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions,
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={getColorClass(emotion, isSelected, parentColor)}
+            className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-gray-800 font-semibold ${
+              isSelected ? 'ring-2 ring-blue-500' : ''
+            }`}
+            style={{ backgroundColor: getColorValue(emotion.color) }}
             onClick={() => onSelect(emotion)}
           >
             {emotion.name}

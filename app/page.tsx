@@ -23,19 +23,27 @@ const colorMap: { [key: string]: string } = {
   Purple: 'purple',
   Pink: 'pink',
   Gray: 'gray',
-  Orange: 'orange', // Add this line
-  // Add more color mappings as needed
+  Orange: 'orange',
 }
 
-const getColorClass = (color: string): string => {
-  const mappedColor = colorMap[color] || 'gray'
-  return `bg-${mappedColor}-200`
+const getColorValue = (color: string): string => {
+  const colorMap: { [key: string]: string } = {
+    Blue: '#bfdbfe',
+    Red: '#fecaca',
+    Yellow: '#fef08a',
+    Green: '#bbf7d0',
+    Purple: '#e9d5ff',
+    Pink: '#fbcfe8',
+    Gray: '#e5e7eb',
+    Orange: '#fed7aa',
+  }
+  return colorMap[color] || '#ffffff'
 }
 
 export default function Home() {
   const [stage, setStage] = useState(0)
   const [selectedEmotions, setSelectedEmotions] = useState<Emotion[][]>([[]])
-  const [backgroundColor, setBackgroundColor] = useState('bg-white')
+  const [backgroundColor, setBackgroundColor] = useState('#ffffff')
   const [emotions, setEmotions] = useState<Emotion[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -66,15 +74,13 @@ export default function Home() {
       const newSelected = [...prev]
       const index = newSelected[stage].findIndex(e => e.name === emotion.name)
       if (index !== -1) {
-        // Deselect the emotion
         newSelected[stage] = newSelected[stage].filter(e => e.name !== emotion.name)
       } else {
-        // Select the emotion
         newSelected[stage] = [...newSelected[stage], emotion]
       }
       return newSelected
     })
-    setBackgroundColor(getColorClass(emotion.color))
+    setBackgroundColor(getColorValue(emotion.color))
   }
 
   const handleNextStage = () => {
@@ -93,7 +99,7 @@ export default function Home() {
       const lastStageEmotions = selectedEmotions[stage - 1]
       if (lastStageEmotions && lastStageEmotions.length > 0) {
         const lastEmotion = lastStageEmotions[lastStageEmotions.length - 1]
-        setBackgroundColor(getColorClass(lastEmotion.color))
+        setBackgroundColor(getColorValue(lastEmotion.color))
       } else {
         setBackgroundColor('bg-white')
       }
@@ -126,52 +132,54 @@ export default function Home() {
   }
 
   return (
-    <main className={`min-h-screen ${backgroundColor} transition-colors duration-500 flex flex-col items-center justify-center p-8 relative`}>
-      <NavigationButtons 
-        onBack={stage > 0 ? handleBack : undefined}
-        onNext={stage < 2 && selectedEmotions[stage].length > 0 ? handleNextStage : undefined}
-      />
+    <>
+      <main style={{ backgroundColor }} className="min-h-screen transition-colors duration-500 flex flex-col items-center justify-center p-8 relative">
+        <NavigationButtons 
+          onBack={stage > 0 ? handleBack : undefined}
+          onNext={stage < 2 && selectedEmotions[stage].length > 0 ? handleNextStage : undefined}
+        />
 
-      <AnimatePresence mode="wait">
-        {stage === 0 && (
-          <motion.h1
-            key="question"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            className="text-4xl font-bold mb-12 text-gray-800"
-          >
-            How are you feeling now?
-          </motion.h1>
-        )}
-      </AnimatePresence>
+        <AnimatePresence mode="wait">
+          {stage === 0 && (
+            <motion.h1
+              key="question"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="text-4xl font-bold mb-12 text-gray-800"
+            >
+              How are you feeling now?
+            </motion.h1>
+          )}
+        </AnimatePresence>
 
-      <AnimatePresence mode="wait">
-        {stage === 0 && (
-          <PrimaryEmotions 
-            emotions={getCurrentEmotions()} 
-            onSelect={handleEmotionSelect}
-            selectedEmotions={selectedEmotions[stage]}
-          />
-        )}
-        {stage === 1 && (
-          <SecondaryEmotions 
-            emotions={getCurrentEmotions()}
-            onSelect={handleEmotionSelect}
-            selectedEmotions={selectedEmotions[stage]}
-          />
-        )}
-        {stage === 2 && (
-          <TertiaryEmotions 
-            emotions={getCurrentEmotions()}
-            onSelect={handleEmotionSelect}
-            selectedEmotions={selectedEmotions[stage]}
-          />
-        )}
-      </AnimatePresence>
+        <AnimatePresence mode="wait">
+          {stage === 0 && (
+            <PrimaryEmotions 
+              emotions={getCurrentEmotions()} 
+              onSelect={handleEmotionSelect}
+              selectedEmotions={selectedEmotions[stage]}
+            />
+          )}
+          {stage === 1 && (
+            <SecondaryEmotions 
+              emotions={getCurrentEmotions()}
+              onSelect={handleEmotionSelect}
+              selectedEmotions={selectedEmotions[stage]}
+            />
+          )}
+          {stage === 2 && (
+            <TertiaryEmotions 
+              emotions={getCurrentEmotions()}
+              onSelect={handleEmotionSelect}
+              selectedEmotions={selectedEmotions[stage]}
+            />
+          )}
+        </AnimatePresence>
 
-      <SelectedEmotions emotions={selectedEmotions.flat()} />
-    </main>
+        <SelectedEmotions emotions={selectedEmotions.flat()} />
+      </main>
+    </>
   )
 }
 

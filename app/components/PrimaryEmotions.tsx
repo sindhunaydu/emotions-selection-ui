@@ -11,24 +11,25 @@ interface PrimaryEmotionsProps {
   selectedEmotions: Emotion[]
 }
 
-const colorMap: { [key: string]: string } = {
-  Blue: 'blue',
-  Red: 'red',
-  Yellow: 'yellow',
-  Green: 'green',
-  Purple: 'purple',
-  Pink: 'pink',
-  Gray: 'gray',
-  Orange: 'orange', // Add this line
-  // Add more color mappings as needed
-}
-
-const getColorClass = (color: string): string => {
-  const mappedColor = colorMap[color] || 'gray'
-  return `bg-${mappedColor}-200`
+const getColorValue = (color: string): string => {
+  const colorMap: { [key: string]: string } = {
+    Blue: '#bfdbfe',
+    Red: '#fecaca',
+    Yellow: '#fef08a',
+    Green: '#bbf7d0',
+    Purple: '#e9d5ff',
+    Pink: '#fbcfe8',
+    Gray: '#e5e7eb',
+    Orange: '#fed7aa',
+  }
+  return colorMap[color] || '#ffffff'
 }
 
 export default function PrimaryEmotions({ emotions, onSelect, selectedEmotions }: PrimaryEmotionsProps) {
+  if (!emotions || emotions.length === 0) {
+    return <div>No emotions available</div>
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -38,17 +39,17 @@ export default function PrimaryEmotions({ emotions, onSelect, selectedEmotions }
     >
       {emotions.map((emotion, index) => {
         const isSelected = selectedEmotions.some(e => e.name === emotion.name)
-        const colorClass = getColorClass(emotion.color)
-        console.log(`Emotion: ${emotion.name}, Color: ${emotion.color}, Class: ${colorClass}`) // Log color information
+        
         return (
           <motion.button
             key={emotion.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className={`${colorClass} p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-gray-800 font-semibold ${
+            className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-gray-800 font-semibold ${
               isSelected ? 'ring-2 ring-blue-500' : ''
             }`}
+            style={{ backgroundColor: getColorValue(emotion.color) }}
             onClick={() => onSelect(emotion)}
           >
             {emotion.name}
