@@ -35,24 +35,33 @@ export default function PrimaryEmotions({ emotions, onSelect, selectedEmotions }
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="grid grid-cols-2 md:grid-cols-3 gap-4"
+      className="flex flex-wrap justify-center gap-4"
     >
       {emotions.map((emotion, index) => {
         const isSelected = selectedEmotions.some(e => e.name === emotion.name)
+        const backgroundColor = getColorValue(emotion.color)
         
         return (
           <motion.button
             key={emotion.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-gray-800 font-semibold ${
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-gray-800 font-semibold ${
               isSelected ? 'ring-2 ring-blue-500' : ''
             }`}
-            style={{ backgroundColor: getColorValue(emotion.color) }}
+            style={{ backgroundColor }}
             onClick={() => onSelect(emotion)}
           >
-            {emotion.name}
+            <motion.span
+              initial={{ scale: 1 }}
+              animate={{ scale: isSelected ? [1, 1.2, 1] : 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {emotion.name}
+            </motion.span>
           </motion.button>
         )
       })}

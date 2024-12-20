@@ -9,23 +9,33 @@ interface TertiaryEmotionsProps {
   emotions: Emotion[]
   onSelect: (emotion: Emotion) => void
   selectedEmotions: Emotion[]
+  parentColors: string[] | null
 }
 
-const getColorValue = (color: string): string => {
+const getColorValue = (color: string, parentColors: string[] | null): string => {
   const colorMap: { [key: string]: string } = {
-    Blue: '#eff6ff',
-    Red: '#fef2f2',
-    Yellow: '#fefce8',
-    Green: '#f0fdf4',
-    Purple: '#faf5ff',
-    Pink: '#fdf2f8',
-    Gray: '#f9fafb',
-    Orange: '#fff7ed',
+    Blue: '#bfdbfe',
+    Red: '#fecaca',
+    Yellow: '#fef08a',
+    Green: '#bbf7d0',
+    Purple: '#e9d5ff',
+    Pink: '#fbcfe8',
+    Gray: '#e5e7eb',
+    Orange: '#fed7aa',
   }
-  return colorMap[color] || '#ffffff'
+  const baseColor = colorMap[color] || '#ffffff'
+  return lightenColor(baseColor, 0.4)
 }
 
-export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions }: TertiaryEmotionsProps) {
+const lightenColor = (color: string, amount: number): string => {
+  const num = parseInt(color.replace('#', ''), 16)
+  const r = Math.min(255, Math.round((num >> 16) + (255 - (num >> 16)) * amount))
+  const g = Math.min(255, Math.round((num >> 8 & 255) + (255 - (num >> 8 & 255)) * amount))
+  const b = Math.min(255, Math.round((num & 255) + (255 - (num & 255)) * amount))
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
+}
+
+export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions, parentColors }: TertiaryEmotionsProps) {
   if (!emotions || emotions.length === 0) {
     return <div>No tertiary emotions available</div>
   }
@@ -35,23 +45,33 @@ export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="grid grid-cols-2 md:grid-cols-3 gap-4"
+      className="flex flex-wrap justify-center gap-4 w-full"
     >
       {emotions.map((emotion, index) => {
         const isSelected = selectedEmotions.some(e => e.name === emotion.name)
+        const parentColor = parentColors ? parentColors[Math.floor(index / (emotions.length / parentColors.length))] : null
+        const backgroundColor = getColorValue(parentColor || emotion.color, parentColors)
         return (
           <motion.button
             key={emotion.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 text-gray-800 font-semibold ${
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-gray-800 font-semibold ${
               isSelected ? 'ring-2 ring-blue-500' : ''
             }`}
-            style={{ backgroundColor: getColorValue(emotion.color) }}
+            style={{ backgroundColor }}
             onClick={() => onSelect(emotion)}
           >
-            {emotion.name}
+            <motion.span
+              initial={{ scale: 1 }}
+              animate={{ scale: isSelected ? [1, 1.2, 1] : 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {emotion.name}
+            </motion.span>
           </motion.button>
         )
       })}
