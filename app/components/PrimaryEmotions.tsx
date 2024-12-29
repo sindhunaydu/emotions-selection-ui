@@ -35,7 +35,7 @@ export default function PrimaryEmotions({ emotions, onSelect, selectedEmotions }
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex flex-wrap justify-center gap-4"
+      className="flex flex-wrap justify-start gap-4"
     >
       {emotions.map((emotion, index) => {
         const isSelected = selectedEmotions.some(e => e.name === emotion.name)

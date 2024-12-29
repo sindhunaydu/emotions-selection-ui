@@ -1,12 +1,13 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react'
 
 interface NavigationButtonsProps {
   onBack?: () => void
   onNext?: () => void
+  onStartOver: () => void
   stage: number
 }
 
-export default function NavigationButtons({ onBack, onNext, stage }: NavigationButtonsProps) {
+export default function NavigationButtons({ onBack, onNext, onStartOver, stage }: NavigationButtonsProps) {
   const getNextButtonText = () => {
     switch (stage) {
       case 0:
@@ -21,17 +22,25 @@ export default function NavigationButtons({ onBack, onNext, stage }: NavigationB
   }
 
   return (
-    <div className="absolute top-4 left-4 right-4 flex justify-between">
-      {onBack && (
+    <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
+      <div className="flex items-center">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-300 mr-2"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={20} />
+          </button>
+        )}
         <button
-          onClick={onBack}
-          className="p-2 rounded-full bg-white bg-opacity-50 hover:bg-opacity-75 transition-colors duration-300"
-          aria-label="Go back"
+          onClick={onStartOver}
+          className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-300 text-sm"
+          aria-label="Start over"
         >
-          <ArrowLeft size={24} />
+          <RotateCcw size={16} />
         </button>
-      )}
-      <div className="flex-grow" />
+      </div>
       {onNext && (
         <button
           onClick={onNext}

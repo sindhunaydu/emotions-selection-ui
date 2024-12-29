@@ -12,7 +12,7 @@ interface TertiaryEmotionsProps {
   parentColors: string[] | null
 }
 
-const getColorValue = (color: string, parentColors: string[] | null): string => {
+const getColorValue = (color: string): string => {
   const colorMap: { [key: string]: string } = {
     Blue: '#bfdbfe',
     Red: '#fecaca',
@@ -23,16 +23,7 @@ const getColorValue = (color: string, parentColors: string[] | null): string => 
     Gray: '#e5e7eb',
     Orange: '#fed7aa',
   }
-  const baseColor = colorMap[color] || '#ffffff'
-  return lightenColor(baseColor, 0.4)
-}
-
-const lightenColor = (color: string, amount: number): string => {
-  const num = parseInt(color.replace('#', ''), 16)
-  const r = Math.min(255, Math.round((num >> 16) + (255 - (num >> 16)) * amount))
-  const g = Math.min(255, Math.round((num >> 8 & 255) + (255 - (num >> 8 & 255)) * amount))
-  const b = Math.min(255, Math.round((num & 255) + (255 - (num & 255)) * amount))
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`
+  return colorMap[color] || '#ffffff'
 }
 
 export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions, parentColors }: TertiaryEmotionsProps) {
@@ -45,12 +36,12 @@ export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions,
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex flex-wrap justify-center gap-4 w-full"
+      className="flex flex-wrap justify-start gap-4 w-full"
     >
       {emotions.map((emotion, index) => {
         const isSelected = selectedEmotions.some(e => e.name === emotion.name)
         const parentColor = parentColors ? parentColors[Math.floor(index / (emotions.length / parentColors.length))] : null
-        const backgroundColor = getColorValue(parentColor || emotion.color, parentColors)
+        const backgroundColor = getColorValue(parentColor || emotion.color)
         return (
           <motion.button
             key={emotion.name}

@@ -36,23 +36,31 @@ export default function EmotionHierarchy({ selectedEmotions, stage }: EmotionHie
           transition={{ delay: stageIndex * 0.2 }}
         >
           <div className="flex flex-wrap gap-2 justify-center">
-            {stageEmotions.map((emotion, index) => (
-              <motion.div
-                key={`${emotion.name}-${index}`}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className={`px-3 py-1 rounded-full text-sm font-medium text-gray-700 shadow-md ${
-                  stageIndex === 0 ? 'text-lg' : stageIndex === 1 ? 'text-base' : 'text-sm'
-                }`}
-                style={{
-                  backgroundColor: getColorValue(emotion.color),
-                  border: `2px solid ${getColorValue(emotion.color)}`,
-                }}
-              >
-                {emotion.name}
-              </motion.div>
-            ))}
+            {stageEmotions.map((emotion, index) => {
+              const primaryColor = selectedEmotions[0].find(e => 
+                e.name === emotion.name || 
+                e.secondaryEmotions?.some(se => se.name === emotion.name) ||
+                e.secondaryEmotions?.some(se => se.tertiaryEmotions?.some(te => te.name === emotion.name))
+              )?.color || emotion.color;
+              
+              return (
+                <motion.div
+                  key={`${emotion.name}-${index}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`px-3 py-1 rounded-full text-sm font-medium text-gray-700 shadow-md ${
+                    stageIndex === 0 ? 'text-lg' : stageIndex === 1 ? 'text-base' : 'text-sm'
+                  }`}
+                  style={{
+                    backgroundColor: getColorValue(primaryColor),
+                    border: `2px solid ${getColorValue(primaryColor)}`,
+                  }}
+                >
+                  {emotion.name}
+                </motion.div>
+              );
+            })}
           </div>
           {stageIndex < stage && stageIndex < 2 && (
             <motion.div
