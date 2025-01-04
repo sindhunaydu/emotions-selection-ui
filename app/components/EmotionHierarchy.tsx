@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 interface Emotion {
   name: string
   color: string
+  secondaryEmotions?: Emotion[]
+  tertiaryEmotions?: Emotion[]
 }
 
 interface EmotionHierarchyProps {
