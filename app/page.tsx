@@ -183,7 +183,7 @@ export default function Home() {
               />
             )}
             {stage === 2 && (
-              <TertiaryEmotions 
+              <TertiaryEmotions
                 emotions={getCurrentEmotions().emotions}
                 onSelect={handleEmotionSelect}
                 selectedEmotions={selectedEmotions[stage]}

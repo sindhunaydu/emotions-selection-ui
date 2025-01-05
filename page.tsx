@@ -10,7 +10,7 @@ import NavigationButtons from './app/components/NavigationButtons'
 
 interface Emotion {
   name: string
-  color?: string
+  color: string
   secondaryEmotions?: Emotion[]
   tertiaryEmotions?: Emotion[]
 }
@@ -116,9 +116,9 @@ export default function Home() {
   }
 
   const getEmotionColor = () => {
-    if (stage === 0) return ''
+    if (stage === 0) return []
     const parentEmotion = selectedEmotions[stage - 1][0]
-    return parentEmotion?.color ? `${parentEmotion.color.toLowerCase()}-100` : ''
+    return parentEmotion?.color ? [`${parentEmotion.color.toLowerCase()}-100`] : []
   }
 
   return (
@@ -126,6 +126,8 @@ export default function Home() {
       <NavigationButtons 
         onBack={stage > 0 ? handleBack : undefined}
         onNext={stage < 2 && selectedEmotions[stage].length > 0 ? handleNextStage : undefined}
+        onStartOver={() => setStage(0)}
+        stage={stage}
       />
 
       <AnimatePresence mode="wait">
@@ -155,7 +157,7 @@ export default function Home() {
             emotions={getCurrentEmotions()}
             onSelect={handleEmotionSelect}
             selectedEmotions={selectedEmotions[stage]}
-            parentColor={getEmotionColor()}
+            parentColors={getEmotionColor()}
           />
         )}
         {stage === 2 && (
@@ -163,7 +165,7 @@ export default function Home() {
             emotions={getCurrentEmotions()}
             onSelect={handleEmotionSelect}
             selectedEmotions={selectedEmotions[stage]}
-            parentColor={getEmotionColor()}
+            parentColors={getEmotionColor()}
           />
         )}
       </AnimatePresence>
