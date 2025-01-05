@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react'
+import { ArrowLeft, ArrowRight, RotateCcw, Info } from 'lucide-react'
 
 interface NavigationButtonsProps {
   onBack?: () => void
@@ -28,7 +28,7 @@ export default function NavigationButtons({ onBack, onNext, onStartOver, stage, 
         {onBack && (
           <button
             onClick={onBack}
-            className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-300 mr-2"
+            className="p-2 rounded-full bg-slate-400 text-white hover:bg-blue-600 transition-colors duration-300 mr-2"
             aria-label="Go back"
           >
             <ArrowLeft size={20} />
@@ -37,12 +37,19 @@ export default function NavigationButtons({ onBack, onNext, onStartOver, stage, 
         {onStartOver && (
           <button
             onClick={onStartOver}
-            className="p-2 rounded-full bg-blue-500 text-white hover:bg-gray-600 transition-colors duration-300 mr-2"
+            className="p-2 rounded-full bg-slate-400 text-white hover:bg-blue-600 transition-colors duration-300 mr-2"
             aria-label="Start over"
           >
             <RotateCcw size={20} />
           </button>
         )}
+        <button
+            onClick={() => window.open("https://www.calm.com/blog/the-feelings-wheel", "_blank")}
+            className="p-2 rounded-full bg-slate-400 text-white hover:bg-blue-600 transition-colors duration-300 mr-2"
+            aria-label="Info"
+          >
+            <Info size={20} />
+          </button>
       </div>
     )
   }

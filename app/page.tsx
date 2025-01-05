@@ -166,6 +166,7 @@ export default function Home() {
             </motion.h1>
           )}
         </AnimatePresence>
+        <p className="instruction-text">Select all that apply</p>
         <div className="flex flex-col md:flex-row items-start justify-center w-full max-w-6xl">
           <div className="w-full md:w-2/3 mb-8 md:mb-0 flex flex-col items-start justify-center">
             <AnimatePresence mode="wait">
