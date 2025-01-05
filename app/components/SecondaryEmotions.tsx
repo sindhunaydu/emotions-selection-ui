@@ -35,7 +35,7 @@ export default function SecondaryEmotions({ emotions, onSelect, selectedEmotions
 
   // Group emotions by their parent primary emotion
   const groupedEmotions = emotions.reduce((acc, emotion, index) => {
-    const parentColor = parentColors ? parentColors[Math.floor(index / (emotions.length / parentColors.length))] : null;
+    const parentColor = parentColors ? parentColors[Math.floor(index / (emotions.length / parentColors.length))] : 'default';
     if (!acc[parentColor]) {
       acc[parentColor] = [];
     }

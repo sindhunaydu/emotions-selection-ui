@@ -37,10 +37,10 @@ export default function NavigationButtons({ onBack, onNext, onStartOver, stage, 
         {onStartOver && (
           <button
             onClick={onStartOver}
-            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-300 text-sm"
+            className="p-2 rounded-full bg-blue-500 text-white hover:bg-gray-600 transition-colors duration-300 mr-2"
             aria-label="Start over"
           >
-            <RotateCcw size={16} />
+            <RotateCcw size={20} />
           </button>
         )}
       </div>

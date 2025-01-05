@@ -128,6 +128,7 @@ export default function Home() {
         onNext={stage < 2 && selectedEmotions[stage].length > 0 ? handleNextStage : undefined}
         onStartOver={() => setStage(0)}
         stage={stage}
+        position="bottom"
       />
 
       <AnimatePresence mode="wait">

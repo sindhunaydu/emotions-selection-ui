@@ -59,7 +59,7 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
       </motion.p>
 
       {tertiaryEmotions.length > 0 && (
-        <div className="mb-16">
+        <div className="mb-12">
           <h2 className="text-2xl font-semibold text-gray-800 text-center mb-8"> {/* Increased bottom margin */}
             You feel
           </h2>
@@ -83,7 +83,7 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
       )}
 
       {(secondaryEmotions.length > 0 || primaryEmotions.length > 0) && (
-        <div className="mb-16">
+        <div className="mb-12">
           <h2 className="text-xl font-semibold text-gray-800 text-center">Your Emotional Journey</h2>
           <div className="mt-8">
             <div className="flex flex-wrap justify-center gap-3">
@@ -120,7 +120,7 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
-        className="mt-12"
+        className="mt-5"
       >
         <button
           onClick={onStartOver}
