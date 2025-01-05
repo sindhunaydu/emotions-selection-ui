@@ -33,42 +33,57 @@ export default function SecondaryEmotions({ emotions, onSelect, selectedEmotions
     return <div>No secondary emotions available</div>
   }
 
+  // Group emotions by their parent primary emotion
+  const groupedEmotions = emotions.reduce((acc, emotion, index) => {
+    const parentColor = parentColors ? parentColors[Math.floor(index / (emotions.length / parentColors.length))] : null;
+    if (!acc[parentColor]) {
+      acc[parentColor] = [];
+    }
+    acc[parentColor].push(emotion);
+    return acc;
+  }, {} as Record<string, Emotion[]>);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex flex-wrap justify-start gap-4 w-full"
+      className="flex flex-col items-start gap-4 w-full"
     >
-      {emotions.map((emotion, index) => {
-        const isSelected = selectedEmotions.some(e => e.name === emotion.name)
-        const parentColor = parentColors ? parentColors[Math.floor(index / (emotions.length / parentColors.length))] : null
-        const backgroundColor = getColorValue(parentColor || emotion.color)
-        return (
-          <motion.button
-            key={emotion.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-gray-800 font-semibold ${
-              isSelected ? 'ring-2 ring-blue-500' : ''
-            }`}
-            style={{ backgroundColor }}
-            onClick={() => onSelect(emotion)}
-          >
-            <motion.span
-              initial={{ scale: 1 }}
-              animate={{ scale: isSelected ? [1, 1.2, 1] : 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              {emotion.name}
-            </motion.span>
-          </motion.button>
-        )
-      })}
+      {Object.entries(groupedEmotions).map(([parentColor, groupEmotions], groupIndex) => (
+        <div key={parentColor || groupIndex} className="w-full">
+          <div className="flex flex-wrap justify-start gap-4 w-full">
+            {groupEmotions.map((emotion, index) => {
+              const isSelected = selectedEmotions.some(e => e.name === emotion.name);
+              const backgroundColor = getColorValue(parentColor || emotion.color);
+              return (
+                <motion.button
+                  key={emotion.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className={`p-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-gray-800 font-semibold ${
+                    isSelected ? 'ring-2 ring-blue-500' : ''
+                  }`}
+                  style={{ backgroundColor }}
+                  onClick={() => onSelect(emotion)}
+                >
+                  <motion.span
+                    initial={{ scale: 1 }}
+                    animate={{ scale: isSelected ? [1, 1.2, 1] : 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {emotion.name}
+                  </motion.span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </motion.div>
-  )
+  );
 }
 

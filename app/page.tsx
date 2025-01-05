@@ -102,6 +102,27 @@ export default function Home() {
     }
   }
 
+  const getCurrentEmotions = () => {
+    if (stage === 0) return { emotions, parentColors: null };
+    if (stage === 1) {
+      const secondaryEmotions = selectedEmotions[0].flatMap(e => e.secondaryEmotions || []);
+      const parentColors = selectedEmotions[0].map(e => e.color);
+      return { 
+        emotions: secondaryEmotions, 
+        parentColors 
+      };
+    }
+    if (stage === 2) {
+      const tertiaryEmotions = selectedEmotions[1].flatMap(e => e.tertiaryEmotions || []);
+      const parentColors = selectedEmotions[0].map(e => e.color);
+      return { 
+        emotions: tertiaryEmotions, 
+        parentColors 
+      };
+    }
+    return { emotions: [], parentColors: null };
+  };
+
   if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>
   }
@@ -116,86 +137,76 @@ export default function Home() {
     )
   }
 
-  const getCurrentEmotions = () => {
-    if (stage === 0) return { emotions, parentColors: null }
-    if (stage === 1) {
-      const secondaryEmotions = selectedEmotions[0].flatMap(e => e.secondaryEmotions || [])
-      const parentColors = selectedEmotions[0].map(e => e.color)
-      return { 
-        emotions: secondaryEmotions, 
-        parentColors 
-      }
-    }
-    if (stage === 2) {
-      const tertiaryEmotions = selectedEmotions[1].flatMap(e => e.tertiaryEmotions || [])
-      const parentColors = selectedEmotions[0].map(e => e.color) // Update: parentColors now uses selectedEmotions[0]
-      return { 
-        emotions: tertiaryEmotions, 
-        parentColors 
-      }
-    }
-    return { emotions: [], parentColors: null }
-  }
-
   if (isComplete) {
     return <ConclusionScreen selectedEmotions={selectedEmotions} onStartOver={resetState} />
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-start justify-center p-4 md:p-8 relative bg-white">
-      <NavigationButtons 
-        onBack={stage > 0 ? handleBack : undefined}
-        onNext={selectedEmotions[stage].length > 0 ? handleNextStage : undefined}
-        stage={stage}
-        onStartOver={resetState}
-      />
-
-      <AnimatePresence mode="wait">
-        {stage === 0 && (
-          <motion.h1
-            key="question"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-gray-800 text-left w-full"
-          >
-            How are you feeling now?
-          </motion.h1>
-        )}
-      </AnimatePresence>
-
-      <div className="flex flex-col md:flex-row items-start justify-center w-full max-w-6xl">
-        <div className="w-full md:w-2/3 mb-8 md:mb-0">
-          <AnimatePresence mode="wait">
-            {stage === 0 && (
-              <PrimaryEmotions 
-                emotions={getCurrentEmotions().emotions} 
-                onSelect={handleEmotionSelect}
-                selectedEmotions={selectedEmotions[stage]}
-              />
-            )}
-            {stage === 1 && (
-              <SecondaryEmotions 
-                emotions={getCurrentEmotions().emotions}
-                onSelect={handleEmotionSelect}
-                selectedEmotions={selectedEmotions[stage]}
-                parentColors={getCurrentEmotions().parentColors}
-              />
-            )}
-            {stage === 2 && (
-              <TertiaryEmotions
-                emotions={getCurrentEmotions().emotions}
-                onSelect={handleEmotionSelect}
-                selectedEmotions={selectedEmotions[stage]}
-                parentColors={getCurrentEmotions().parentColors}
-              />
-            )}
-          </AnimatePresence>
-        </div>
-
-        <EmotionHierarchy 
-          selectedEmotions={selectedEmotions} 
+    <div className="min-h-screen flex flex-col items-start justify-between p-4 md:p-8 relative bg-white">
+      <div className="absolute top-4 left-4">
+        <NavigationButtons 
+          onBack={stage > 0 ? handleBack : undefined}
+          onStartOver={resetState}
           stage={stage}
+          position="top"
+        />
+      </div>
+
+      <div className="w-full flex flex-col items-start justify-center flex-grow px-4 md:px-8">
+        <AnimatePresence mode="wait">
+          {stage === 0 && (
+            <motion.h1
+              key="question"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-gray-800 text-left w-full"
+            >
+              How are you feeling now?
+            </motion.h1>
+          )}
+        </AnimatePresence>
+        <div className="flex flex-col md:flex-row items-start justify-center w-full max-w-6xl">
+          <div className="w-full md:w-2/3 mb-8 md:mb-0 flex flex-col items-start justify-center">
+            <AnimatePresence mode="wait">
+              {stage === 0 && (
+                <PrimaryEmotions 
+                  emotions={getCurrentEmotions().emotions} 
+                  onSelect={handleEmotionSelect}
+                  selectedEmotions={selectedEmotions[stage]}
+                />
+              )}
+              {stage === 1 && (
+                <SecondaryEmotions 
+                  emotions={getCurrentEmotions().emotions}
+                  onSelect={handleEmotionSelect}
+                  selectedEmotions={selectedEmotions[stage]}
+                  parentColors={getCurrentEmotions().parentColors}
+                />
+              )}
+              {stage === 2 && (
+                <TertiaryEmotions
+                  emotions={getCurrentEmotions().emotions}
+                  onSelect={handleEmotionSelect}
+                  selectedEmotions={selectedEmotions[stage]}
+                  parentColors={getCurrentEmotions().parentColors}
+                />
+              )}
+            </AnimatePresence>
+          </div>
+
+          <EmotionHierarchy 
+            selectedEmotions={selectedEmotions} 
+            stage={stage}
+          />
+        </div>
+      </div>
+
+      <div className="w-full mt-8">
+        <NavigationButtons 
+          onNext={selectedEmotions[stage].length > 0 ? handleNextStage : undefined}
+          stage={stage}
+          position="bottom"
         />
       </div>
     </div>

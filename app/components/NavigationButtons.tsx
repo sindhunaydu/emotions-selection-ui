@@ -3,11 +3,12 @@ import { ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react'
 interface NavigationButtonsProps {
   onBack?: () => void
   onNext?: () => void
-  onStartOver: () => void
+  onStartOver?: () => void
   stage: number
+  position: 'top' | 'bottom'
 }
 
-export default function NavigationButtons({ onBack, onNext, onStartOver, stage }: NavigationButtonsProps) {
+export default function NavigationButtons({ onBack, onNext, onStartOver, stage, position }: NavigationButtonsProps) {
   const getNextButtonText = () => {
     switch (stage) {
       case 0:
@@ -21,26 +22,33 @@ export default function NavigationButtons({ onBack, onNext, onStartOver, stage }
     }
   }
 
-  return (
-    <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
+  if (position === 'top') {
+    return (
       <div className="flex items-center">
         {onBack && (
           <button
             onClick={onBack}
-            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-300 mr-2"
+            className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-300 mr-2"
             aria-label="Go back"
           >
             <ArrowLeft size={20} />
           </button>
         )}
-        <button
-          onClick={onStartOver}
-          className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-300 text-sm"
-          aria-label="Start over"
-        >
-          <RotateCcw size={16} />
-        </button>
+        {onStartOver && (
+          <button
+            onClick={onStartOver}
+            className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-300 text-sm"
+            aria-label="Start over"
+          >
+            <RotateCcw size={16} />
+          </button>
+        )}
       </div>
+    )
+  }
+
+  return (
+    <div className="flex items-start">
       {onNext && (
         <button
           onClick={onNext}
