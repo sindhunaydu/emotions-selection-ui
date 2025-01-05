@@ -49,7 +49,7 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    fetch('https://emotion-selection-api-xjebr.ondigitalocean.app/api/emotions/listAll')
+    fetch('https://api.whatfeeling.com/api/emotions/listAll')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)
