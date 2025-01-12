@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
+import TertiaryEmotionsImage from './TertiaryEmotionsImage'
+import { Share2 } from 'lucide-react'
 
 interface Emotion {
   name: string
@@ -27,6 +30,8 @@ const getColorValue = (color: string): string => {
 }
 
 export default function ConclusionScreen({ selectedEmotions, onStartOver }: ConclusionScreenProps) {
+  const [shareImageUrl, setShareImageUrl] = useState<string | null>(null)
+
   const tertiaryEmotions = selectedEmotions[2] || []
   const secondaryEmotions = selectedEmotions[1] || []
   const primaryEmotions = selectedEmotions[0] || []
@@ -38,6 +43,33 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
       pe.secondaryEmotions?.some(se => se.tertiaryEmotions?.some(te => te.name === emotion.name))
     )
     return primaryEmotion ? primaryEmotion.color : emotion.color
+  }
+
+  const handleShare = async () => {
+    if (shareImageUrl) {
+      try {
+        const blob = await (await fetch(shareImageUrl)).blob()
+        const file = new File([blob], 'my-emotions.png', { type: blob.type })
+        
+        if (navigator.share) {
+          await navigator.share({
+            title: 'My Emotions',
+            text: 'This is how I feel right now.',
+            files: [file]
+          })
+        } else {
+          // Fallback for browsers that don't support Web Share API
+          const link = document.createElement('a')
+          link.href = shareImageUrl
+          link.download = 'my-emotions.png'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+        }
+      } catch (error) {
+        console.error('Error sharing:', error)
+      }
+    }
   }
 
   return (
@@ -60,10 +92,10 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
 
       {tertiaryEmotions.length > 0 && (
         <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 text-center mb-8"> {/* Increased bottom margin */}
+          <h2 className="text-2xl font-semibold text-gray-800 text-center mb-8">
             You feel
           </h2>
-          <div className="mt-8"> {/* Added new div with top margin */}
+          <div className="mt-8">
             <div className="flex flex-wrap justify-center gap-4">
               {tertiaryEmotions.map((emotion, index) => (
                 <motion.div
@@ -120,7 +152,7 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
-        className="mt-5"
+        className="mt-5 flex gap-4"
       >
         <button
           onClick={onStartOver}
@@ -128,8 +160,24 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
         >
           Start Over
         </button>
+        {tertiaryEmotions.length > 0 && (
+          <button
+            onClick={handleShare}
+            className="px-6 py-3 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600 transition-colors duration-300 flex items-center"
+          >
+            <Share2 className="mr-2" size={20} />
+            Share with someone you trust
+          </button>
+        )}
       </motion.div>
+
+      <TertiaryEmotionsImage
+        emotions={tertiaryEmotions.map(emotion => ({
+          ...emotion,
+          color: getColorValue(findPrimaryColor(emotion))
+        }))}
+        onImageGenerated={setShareImageUrl}
+      />
     </div>
   )
 }
-
