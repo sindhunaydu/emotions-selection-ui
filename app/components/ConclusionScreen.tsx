@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import TertiaryEmotionsImage from './TertiaryEmotionsImage'
 import { Share2 } from 'lucide-react'
+import TertiaryEmotionsText from './TertiaryEmotionsText'
 
 interface Emotion {
   name: string
@@ -30,7 +30,7 @@ const getColorValue = (color: string): string => {
 }
 
 export default function ConclusionScreen({ selectedEmotions, onStartOver }: ConclusionScreenProps) {
-  const [shareImageUrl, setShareImageUrl] = useState<string | null>(null)
+  const [shareText, setShareText] = useState<string | null>(null)
 
   const tertiaryEmotions = selectedEmotions[2] || []
   const secondaryEmotions = selectedEmotions[1] || []
@@ -46,25 +46,18 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
   }
 
   const handleShare = async () => {
-    if (shareImageUrl) {
+    if (shareText) {
       try {
-        const blob = await (await fetch(shareImageUrl)).blob()
-        const file = new File([blob], 'my-emotions.png', { type: blob.type })
         
         if (navigator.share) {
           await navigator.share({
-            title: 'My Emotions',
-            text: 'This is how I feel right now.',
-            files: [file]
+            title: 'Hi there, I used whatfeeling.com to identify my emotions.',
+            text: shareText
           })
         } else {
           // Fallback for browsers that don't support Web Share API
-          const link = document.createElement('a')
-          link.href = shareImageUrl
-          link.download = 'my-emotions.png'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
+          await navigator.clipboard.writeText(shareText)
+          alert('The text has been copied to your clipboard. You can now paste it anywhere you like.')
         }
       } catch (error) {
         console.error('Error sharing:', error)
@@ -161,22 +154,25 @@ export default function ConclusionScreen({ selectedEmotions, onStartOver }: Conc
           Start Over
         </button>
         {tertiaryEmotions.length > 0 && (
-          <button
+            <button
             onClick={handleShare}
-            className="px-6 py-3 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600 transition-colors duration-300 flex items-center"
-          >
+            className="relative px-6 py-3 bg-green-500 text-white rounded-full font-semibold hover:bg-green-600 transition-colors duration-300 flex items-center group"
+            >
             <Share2 className="mr-2" size={20} />
-            Share with someone you trust
-          </button>
+            Share
+            <span className="absolute bottom-full mb-2 hidden group-hover:block bg-gray-500 text-white text-sm rounded py-1 px-3">
+              Share how you feel with someone you trust
+            </span>
+            </button>
         )}
       </motion.div>
 
-      <TertiaryEmotionsImage
+      <TertiaryEmotionsText
         emotions={tertiaryEmotions.map(emotion => ({
           ...emotion,
-          color: getColorValue(findPrimaryColor(emotion))
+          color: findPrimaryColor(emotion)
         }))}
-        onImageGenerated={setShareImageUrl}
+        onTextGenerated={setShareText}
       />
     </div>
   )
