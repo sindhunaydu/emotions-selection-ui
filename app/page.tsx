@@ -8,6 +8,7 @@ import TertiaryEmotions from './components/TertiaryEmotions'
 import NavigationButtons from './components/NavigationButtons'
 import EmotionHierarchy from './components/EmotionHierarchy'
 import ConclusionScreen from './components/ConclusionScreen'
+import NotSureModal from './components/NotSureModal'
 
 interface Emotion {
   name: string
@@ -37,6 +38,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isComplete, setIsComplete] = useState(false)
+  const [isNotSureModalOpen, setIsNotSureModalOpen] = useState(false)
 
   const resetState = () => {
     setStage(0)
@@ -166,7 +168,6 @@ export default function Home() {
             </motion.h1>
           )}
         </AnimatePresence>
-        <p className="instruction-text">Select all that apply</p>
         <div className="flex flex-col md:flex-row items-start justify-center w-full max-w-6xl">
           <div className="w-full md:w-2/3 mb-8 md:mb-0 flex flex-col items-start justify-center">
             <AnimatePresence mode="wait">
@@ -175,6 +176,7 @@ export default function Home() {
                   emotions={getCurrentEmotions().emotions} 
                   onSelect={handleEmotionSelect}
                   selectedEmotions={selectedEmotions[stage]}
+                  onNotSureClick={() => setIsNotSureModalOpen(true)}
                 />
               )}
               {stage === 1 && (
@@ -210,6 +212,10 @@ export default function Home() {
           position="bottom"
         />
       </div>
+      <NotSureModal
+        isOpen={isNotSureModalOpen}
+        onClose={() => setIsNotSureModalOpen(false)}
+      />
     </div>
   )
 }
