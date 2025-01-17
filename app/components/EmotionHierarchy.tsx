@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 interface Emotion {
   name: string
   color: string
+  parentColor?: string
   secondaryEmotions?: Emotion[]
   tertiaryEmotions?: Emotion[]
 }
@@ -39,11 +40,7 @@ export default function EmotionHierarchy({ selectedEmotions, stage }: EmotionHie
         >
           <div className="flex flex-wrap gap-2 justify-center">
             {stageEmotions.map((emotion, index) => {
-              const primaryColor = selectedEmotions[0].find(e => 
-                e.name === emotion.name || 
-                e.secondaryEmotions?.some(se => se.name === emotion.name) ||
-                e.secondaryEmotions?.some(se => se.tertiaryEmotions?.some(te => te.name === emotion.name))
-              )?.color || emotion.color;
+              const displayColor = stageIndex === 0 ? emotion.color : emotion.parentColor || emotion.color;
               
               return (
                 <motion.div
@@ -55,8 +52,8 @@ export default function EmotionHierarchy({ selectedEmotions, stage }: EmotionHie
                     stageIndex === 0 ? 'text-lg' : stageIndex === 1 ? 'text-base' : 'text-sm'
                   }`}
                   style={{
-                    backgroundColor: getColorValue(primaryColor),
-                    border: `2px solid ${getColorValue(primaryColor)}`,
+                    backgroundColor: getColorValue(displayColor),
+                    border: `2px solid ${getColorValue(displayColor)}`,
                   }}
                 >
                   {emotion.name}
@@ -83,4 +80,3 @@ export default function EmotionHierarchy({ selectedEmotions, stage }: EmotionHie
     </div>
   )
 }
-

@@ -13,6 +13,7 @@ import NotSureModal from './app/components/NotSureModal'
 interface Emotion {
   name: string
   color: string
+  parentColor?: string
   secondaryEmotions?: Emotion[]
   tertiaryEmotions?: Emotion[]
 }
@@ -74,11 +75,28 @@ export default function Home() {
     console.log('Selected emotion:', emotion)
     setSelectedEmotions(prev => {
       const newSelected = [...prev]
-      const index = newSelected[stage].findIndex(e => e.name === emotion.name)
-      if (index !== -1) {
-        newSelected[stage] = newSelected[stage].filter(e => e.name !== emotion.name)
+      if (stage === 0) {
+        // For primary emotions, set the parentColor to its own color
+        const updatedEmotion = { ...emotion, parentColor: emotion.color }
+        const index = newSelected[stage].findIndex(e => e.name === emotion.name)
+        if (index !== -1) {
+          newSelected[stage] = newSelected[stage].filter(e => e.name !== emotion.name)
+        } else {
+          newSelected[stage] = [...newSelected[stage], updatedEmotion]
+        }
       } else {
-        newSelected[stage] = [...newSelected[stage], emotion]
+        // For secondary and tertiary emotions, find the parent color
+        const parentPrimary = newSelected[0].find(e => 
+          e.secondaryEmotions?.some(se => se.name === emotion.name) ||
+          e.secondaryEmotions?.some(se => se.tertiaryEmotions?.some(te => te.name === emotion.name))
+        )
+        const updatedEmotion = { ...emotion, parentColor: parentPrimary?.color || emotion.color }
+        const index = newSelected[stage].findIndex(e => e.name === emotion.name)
+        if (index !== -1) {
+          newSelected[stage] = newSelected[stage].filter(e => e.name !== emotion.name)
+        } else {
+          newSelected[stage] = [...newSelected[stage], updatedEmotion]
+        }
       }
       return newSelected
     })
@@ -107,19 +125,27 @@ export default function Home() {
   const getCurrentEmotions = () => {
     if (stage === 0) return { emotions, parentColors: null };
     if (stage === 1) {
-      const secondaryEmotions = selectedEmotions[0].flatMap(e => e.secondaryEmotions || []);
-      const parentColors = selectedEmotions[0].map(e => e.color);
+      const secondaryEmotions = selectedEmotions[0].flatMap(e => 
+        (e.secondaryEmotions || []).map(se => ({ ...se, parentColor: e.color }))
+      );
       return { 
         emotions: secondaryEmotions, 
-        parentColors 
+        parentColors: selectedEmotions[0].map(e => e.color)
       };
     }
     if (stage === 2) {
-      const tertiaryEmotions = selectedEmotions[1].flatMap(e => e.tertiaryEmotions || []);
-      const parentColors = selectedEmotions[0].map(e => e.color);
+      const tertiaryEmotions = selectedEmotions[1].flatMap(secondaryEmotion => {
+        const parentPrimary = selectedEmotions[0].find(primaryEmotion => 
+          primaryEmotion.secondaryEmotions?.some(se => se.name === secondaryEmotion.name)
+        );
+        return (secondaryEmotion.tertiaryEmotions || []).map(te => ({
+          ...te,
+          parentColor: parentPrimary?.color || secondaryEmotion.color
+        }));
+      });
       return { 
         emotions: tertiaryEmotions, 
-        parentColors 
+        parentColors: selectedEmotions[0].map(e => e.color)
       };
     }
     return { emotions: [], parentColors: null };
@@ -142,6 +168,8 @@ export default function Home() {
   if (isComplete) {
     return <ConclusionScreen selectedEmotions={selectedEmotions} onStartOver={resetState} />
   }
+
+  const { emotions: currentEmotions, parentColors } = getCurrentEmotions();
 
   return (
     <div className="min-h-screen flex flex-col items-start justify-between p-4 md:p-8 relative bg-white">
@@ -173,7 +201,7 @@ export default function Home() {
             <AnimatePresence mode="wait">
               {stage === 0 && (
                 <PrimaryEmotions 
-                  emotions={getCurrentEmotions().emotions} 
+                  emotions={currentEmotions} 
                   onSelect={handleEmotionSelect}
                   selectedEmotions={selectedEmotions[stage]}
                   onNotSureClick={() => setIsNotSureModalOpen(true)}
@@ -181,18 +209,18 @@ export default function Home() {
               )}
               {stage === 1 && (
                 <SecondaryEmotions 
-                  emotions={getCurrentEmotions().emotions}
+                  emotions={currentEmotions}
                   onSelect={handleEmotionSelect}
                   selectedEmotions={selectedEmotions[stage]}
-                  parentColors={getCurrentEmotions().parentColors}
+                  parentColors={parentColors}
                 />
               )}
               {stage === 2 && (
                 <TertiaryEmotions
-                  emotions={getCurrentEmotions().emotions}
+                  emotions={currentEmotions}
                   onSelect={handleEmotionSelect}
                   selectedEmotions={selectedEmotions[stage]}
-                  parentColors={getCurrentEmotions().parentColors}
+                  parentColors={parentColors}
                 />
               )}
             </AnimatePresence>

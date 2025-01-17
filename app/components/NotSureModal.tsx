@@ -77,7 +77,7 @@ export default function NotSureModal({ isOpen, onClose }: NotSureModalProps) {
             </div>
             <p className="text-md text-red-600 mb-4">
               WARNING: Perplexity AI will be used to analyze your text and return a result. Please do not share any private information.
-              AI can make mistakes. 
+              AI may make mistakes. Please use with discretion.
             </p>
             <form onSubmit={handleSubmit}>
               <textarea

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 interface Emotion {
   name: string
   color: string
+  parentColor?: string
   secondaryEmotions?: Emotion[]
   tertiaryEmotions?: Emotion[]
 }
@@ -34,8 +35,8 @@ export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions,
   }
 
   // Group emotions by their parent primary emotion
-  const groupedEmotions = emotions.reduce((acc, emotion, index) => {
-    const parentColor = parentColors ? parentColors[Math.floor(index / (emotions.length / parentColors.length))] : 'default';
+  const groupedEmotions = emotions.reduce((acc, emotion) => {
+    const parentColor = emotion.parentColor || 'default';
     if (!acc[parentColor]) {
       acc[parentColor] = [];
     }
@@ -55,7 +56,7 @@ export default function TertiaryEmotions({ emotions, onSelect, selectedEmotions,
           <div className="flex flex-wrap justify-start gap-4 w-full">
             {groupEmotions.map((emotion, index) => {
               const isSelected = selectedEmotions.some(e => e.name === emotion.name);
-              const backgroundColor = getColorValue(parentColor || emotion.color);
+              const backgroundColor = getColorValue(emotion.parentColor || parentColor);
               return (
                 <motion.button
                   key={emotion.name}

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 interface Emotion {
   name: string
   color: string
+  parentColor?: string
   secondaryEmotions?: Emotion[]
   tertiaryEmotions?: Emotion[]
 }
