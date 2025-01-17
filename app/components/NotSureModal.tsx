@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Loader } from 'lucide-react'
 
@@ -12,6 +12,14 @@ export default function NotSureModal({ isOpen, onClose }: NotSureModalProps) {
   const [result, setResult] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setInput('')
+      setResult(null)
+      setError(null)
+    }
+  }, [isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,16 +62,22 @@ export default function NotSureModal({ isOpen, onClose }: NotSureModalProps) {
             className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
           >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">Describe Your Feelings</h2>
+              <h2 className="text-2xl font-bold text-gray-800">Describe your feelings</h2>
               <button
-                onClick={onClose}
+                onClick={() => {
+                  setInput('')
+                  setResult(null)
+                  setError(null)
+                  onClose()
+                }}
                 className="text-gray-500 hover:text-gray-700 transition-colors"
               >
                 <X size={24} />
               </button>
             </div>
             <p className="text-md text-red-600 mb-4">
-              WARNING: AI will be used to analyze your text and return a result. AI can make mistakes. Please do not share any private information.
+              WARNING: Perplexity AI will be used to analyze your text and return a result. Please do not share any private information.
+              AI can make mistakes. 
             </p>
             <form onSubmit={handleSubmit}>
               <textarea
