@@ -28,11 +28,7 @@ export default function TertiaryEmotionsText({ emotions, onTextGenerated }: Tert
 
     const emotionsListBulletPoints = emotions.map(e => `${colorToEmoji(e.color)} ${e.name}`).join('\n');
     const text = `This is how I feel right now:
-${emotionsListBulletPoints}
-
-For more information about these emotions and suggestions on how to address them, please visit the link below:
-[Link]
-Remember to be kind—to yourself and others!`;
+${emotionsListBulletPoints}`;
     onTextGenerated(text);
   }, [emotions, onTextGenerated]);
   return null;
