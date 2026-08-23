@@ -30,6 +30,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <a
+          className="easily-bored-credit"
+          href="https://theeasilybored.com/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Made by The Easily Bored ↗
+        </a>
         <Analytics />
       </body>
     </html>
